@@ -3,6 +3,7 @@ package com.documentService.documentService.Service;
 import com.documentService.documentService.Dao.DocumentRepository;
 import com.documentService.documentService.Entity.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -40,8 +41,8 @@ public class DocumentService {
             if (documentRepository.existsById(document.getId())) {
                 throw new IllegalArgumentException();
             }
-            Document documentCreated=documentRepository.save(document);
-            return ResponseEntity.ok(documentCreated);
+            Document documentOptional = documentRepository.save(document);
+            return ResponseEntity.ok(documentOptional);
         }catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
@@ -64,8 +65,8 @@ public class DocumentService {
             Optional<Document> documentOptional = documentRepository.findById(id);
             documentRepository.deleteById(id);
             return ResponseEntity.noContent().build();
-        }catch (IllegalArgumentException e){
-            return ResponseEntity.notFound().build();
+        }catch (EmptyResultDataAccessException e){
+            return ResponseEntity.noContent().build();
         }
     }
 }
